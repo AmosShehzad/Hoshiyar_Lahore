@@ -72,7 +72,10 @@ REPO_ROOT_DATA = os.path.abspath(
 # CORS: allow the Next.js dev server and deployed frontend to call us.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten for production; fine for a hackathon MVP
+    allow_origins=[
+        "http://localhost:3000",
+        "https://hoshiyar-lahore.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
