@@ -32,7 +32,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.db.database import get_connection
+from app.db.database import get_connection
 from backend.app.services.risk_engine import calculate_heat_risk, explain
 from backend.app.services.heat_intelligence import (
     historical_comparison,
