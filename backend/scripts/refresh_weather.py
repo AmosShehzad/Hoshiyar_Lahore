@@ -22,7 +22,6 @@ from __future__ import annotations
 import datetime as dt
 import os
 import sys
-import time
 
 # Allow running as a script: add repo root to path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -35,19 +34,22 @@ from backend.app.db.database import (  # noqa: E402
     load_towns_from_metadata,
 )
 from backend.app.services.open_meteo import (  # noqa: E402
-    fetch_current_and_forecast,
+    fetch_multiple_current_and_forecast,
 )
 
 FORECAST_DAYS = 3
 
 
 def refresh_all_towns() -> tuple[int, int, str | None]:
-    """Returns (towns_updated, towns_failed, last_error). Callers (including
+    """Fetch and store weather for all towns using one Open-Meteo request.
+
+    Returns (towns_updated, towns_failed, last_error). Callers (including
     the auto-refresh scheduler) can tell a real success from a silent total
     failure - refresh_all_towns() never raises even when every fetch fails,
     so the return value is the only reliable signal. last_error is the most
     recent failure's actual message (e.g. "429 ... Too Many Requests"), so a
-    status endpoint can report *why* it failed instead of guessing "offline"."""
+    status endpoint can report *why* it failed instead of guessing "offline".
+    """
     now_iso = dt.datetime.now().isoformat(timespec="seconds")
 
     # Make sure DB + towns exist
@@ -55,85 +57,128 @@ def refresh_all_towns() -> tuple[int, int, str | None]:
     load_towns_from_metadata()
 
     conn = get_connection()
-    towns = conn.execute(
-        "SELECT id, name, centroid_lat, centroid_lon FROM towns"
-    ).fetchall()
 
-    print(f"Refreshing weather for {len(towns)} towns...")
-    ok, failed = 0, 0
-    last_error: str | None = None
+    try:
+        towns = conn.execute(
+            "SELECT id, name, centroid_lat, centroid_lon FROM towns"
+        ).fetchall()
 
-    for town in towns:
-        tid = town["id"]
-        lat = town["centroid_lat"]
-        lon = town["centroid_lon"]
+        print(f"Refreshing weather for {len(towns)} towns...")
+
+        if not towns:
+            print("No towns found.")
+            return 0, 0, None
+
+        # Build one batch request for every town.
+        locations = [
+            (town["centroid_lat"], town["centroid_lon"])
+            for town in towns
+        ]
+
         try:
-            current, hourly = fetch_current_and_forecast(
-                lat, lon, forecast_days=FORECAST_DAYS
+            weather_results = fetch_multiple_current_and_forecast(
+                locations,
+                forecast_days=FORECAST_DAYS,
             )
         except Exception as exc:  # noqa: BLE001
-            print(f"  [{tid}] FAILED: {exc}")
-            failed += 1
-            last_error = str(exc)
-            time.sleep(0.5)  # brief pause even on failure, before the next town
-            continue
+            print(f"  BATCH WEATHER REQUEST FAILED: {exc}")
+            return 0, len(towns), str(exc)
 
-        # Clear previous rows for this town (keep the DB small and current)
-        conn.execute("DELETE FROM weather_current WHERE town_id = ?", (tid,))
-        conn.execute("DELETE FROM weather_forecast WHERE town_id = ?", (tid,))
+        ok = 0
+        failed = 0
+        last_error: str | None = None
 
-        # Insert current
-        conn.execute(
-            """
-            INSERT INTO weather_current (
-                town_id, observed_at, fetched_at, temperature_c,
-                humidity_pct, apparent_temperature_c, wind_speed_kmh
-            ) VALUES (?,?,?,?,?,?,?)
-            """,
-            (
-                tid,
-                current.time,
-                now_iso,
-                current.temperature_c,
-                current.humidity_pct,
-                current.apparent_temperature_c,
-                current.wind_speed_kmh,
-            ),
-        )
+        for town, result in zip(towns, weather_results):
+            tid = town["id"]
+            current, hourly = result
 
-        # Insert forecast hours
-        rows = []
-        for i in range(len(hourly)):
-            rows.append((
-                tid,
-                hourly.times[i],
-                now_iso,
-                hourly.temperature_c[i] if i < len(hourly.temperature_c) else None,
-                hourly.humidity_pct[i] if i < len(hourly.humidity_pct) else None,
-                hourly.apparent_temperature_c[i]
-                if i < len(hourly.apparent_temperature_c) else None,
-            ))
-        conn.executemany(
-            """
-            INSERT INTO weather_forecast (
-                town_id, forecast_time, fetched_at, temperature_c,
-                humidity_pct, apparent_temperature_c
-            ) VALUES (?,?,?,?,?,?)
-            """,
-            rows,
-        )
-        conn.commit()
-        print(f"  [{tid}] OK - current {current.temperature_c}C, "
-              f"{len(rows)} forecast hours")
-        ok += 1
-        time.sleep(0.5)  # brief pause between towns - gentle on the API
+            try:
+                # Clear previous rows for this town.
+                conn.execute(
+                    "DELETE FROM weather_current WHERE town_id = ?",
+                    (tid,),
+                )
+                conn.execute(
+                    "DELETE FROM weather_forecast WHERE town_id = ?",
+                    (tid,),
+                )
 
-    conn.close()
-    print(f"\nDone. {ok} towns updated, {failed} failed.")
-    if failed and ok == 0:
-        print("All fetches failed. Are you offline? Open-Meteo needs internet "
-              "(no API key required).")
-    return ok, failed, last_error
+                # Insert current weather.
+                conn.execute(
+                    """
+                    INSERT INTO weather_current (
+                        town_id, observed_at, fetched_at, temperature_c,
+                        humidity_pct, apparent_temperature_c, wind_speed_kmh
+                    ) VALUES (?,?,?,?,?,?,?)
+                    """,
+                    (
+                        tid,
+                        current.time,
+                        now_iso,
+                        current.temperature_c,
+                        current.humidity_pct,
+                        current.apparent_temperature_c,
+                        current.wind_speed_kmh,
+                    ),
+                )
+
+                # Insert forecast hours.
+                rows = []
+
+                for i in range(len(hourly)):
+                    rows.append((
+                        tid,
+                        hourly.times[i],
+                        now_iso,
+                        (
+                            hourly.temperature_c[i]
+                            if i < len(hourly.temperature_c)
+                            else None
+                        ),
+                        (
+                            hourly.humidity_pct[i]
+                            if i < len(hourly.humidity_pct)
+                            else None
+                        ),
+                        (
+                            hourly.apparent_temperature_c[i]
+                            if i < len(hourly.apparent_temperature_c)
+                            else None
+                        ),
+                    ))
+
+                conn.executemany(
+                    """
+                    INSERT INTO weather_forecast (
+                        town_id, forecast_time, fetched_at, temperature_c,
+                        humidity_pct, apparent_temperature_c
+                    ) VALUES (?,?,?,?,?,?)
+                    """,
+                    rows,
+                )
+
+                conn.commit()
+
+                print(
+                    f"  [{tid}] OK - current "
+                    f"{current.temperature_c}C, "
+                    f"{len(rows)} forecast hours"
+                )
+
+                ok += 1
+
+            except Exception as exc:  # noqa: BLE001
+                print(f"  [{tid}] DATABASE FAILED: {exc}")
+                conn.rollback()
+                failed += 1
+                last_error = str(exc)
+
+        print(f"\nDone. {ok} towns updated, {failed} failed.")
+
+        return ok, failed, last_error
+
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":

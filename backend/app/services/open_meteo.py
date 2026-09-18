@@ -186,6 +186,86 @@ def fetch_current_and_forecast(
 
     return current, hourly
 
+def fetch_multiple_current_and_forecast(
+    locations: list[tuple[float, float]],
+    forecast_days: int = 3,
+) -> list[tuple[CurrentWeather, HourlyForecast]]:
+    """
+    Fetch current conditions and hourly forecasts for multiple locations
+    using a single Open-Meteo API request.
+
+    Open-Meteo returns one response object per latitude/longitude pair,
+    preserving the order of the requested locations.
+    """
+    if not locations:
+        return []
+
+    params = {
+        "latitude": ",".join(str(lat) for lat, _ in locations),
+        "longitude": ",".join(str(lon) for _, lon in locations),
+        "current": ",".join([
+            "temperature_2m",
+            "relative_humidity_2m",
+            "apparent_temperature",
+            "wind_speed_10m",
+        ]),
+        "hourly": ",".join([
+            "temperature_2m",
+            "relative_humidity_2m",
+            "apparent_temperature",
+        ]),
+        "forecast_days": forecast_days,
+        "timezone": TIMEZONE,
+    }
+
+    resp = _get_with_retry(FORECAST_URL, params)
+    data = resp.json()
+
+    # Open-Meteo returns a list for multiple coordinates.
+    if not isinstance(data, list):
+        data = [data]
+
+    results: list[tuple[CurrentWeather, HourlyForecast]] = []
+
+    for item in data:
+        if "current" not in item or "hourly" not in item:
+            raise ValueError(
+                "Open-Meteo response missing 'current' or 'hourly'. "
+                f"Got keys: {list(item.keys())}"
+            )
+
+        cur = item["current"]
+        current = CurrentWeather(
+            time=cur.get("time", ""),
+            temperature_c=_num(cur.get("temperature_2m")),
+            humidity_pct=_num(cur.get("relative_humidity_2m")),
+            apparent_temperature_c=_num(cur.get("apparent_temperature")),
+            wind_speed_kmh=_num(cur.get("wind_speed_10m")),
+        )
+
+        h = item["hourly"]
+        hourly = HourlyForecast(
+            times=h.get("time", []),
+            temperature_c=[
+                _num(v) for v in h.get("temperature_2m", [])
+            ],
+            humidity_pct=[
+                _num(v) for v in h.get("relative_humidity_2m", [])
+            ],
+            apparent_temperature_c=[
+                _num(v) for v in h.get("apparent_temperature", [])
+            ],
+        )
+
+        results.append((current, hourly))
+
+    if len(results) != len(locations):
+        raise ValueError(
+            f"Open-Meteo returned {len(results)} locations, "
+            f"but {len(locations)} were requested."
+        )
+
+    return results
 
 def fetch_historical_daily_max(
     lat: float,
