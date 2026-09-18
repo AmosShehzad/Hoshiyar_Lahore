@@ -62,7 +62,7 @@ _scheduler: BackgroundScheduler | None = None
 def _refresh_weather_job() -> None:
     global _last_weather_refresh, _last_weather_error, _weather_cooldown_until
     try:
-        from backend.scripts.refresh_weather import refresh_all_towns
+        from scripts.refresh_weather import refresh_all_towns
         ok, failed, last_fetch_error = refresh_all_towns()
         if ok == 0:
             # Every town failed - this is NOT a successful refresh, even though

@@ -32,7 +32,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import get_connection
+from app.db.database import get_connection, init_db, load_towns_from_metadata
 from app.services.risk_engine import calculate_heat_risk, explain
 from app.services.heat_intelligence import (
     historical_comparison,
@@ -87,6 +87,8 @@ def _on_startup():
     """Start the auto-refresh background scheduler (see backend/app/scheduler.py).
     Requires the backend to run as a persistent process - see that module's
     docstring for the deployment implication (Render/Railway, not serverless)."""
+    init_db()
+    load_towns_from_metadata()
     start_scheduler()
 
 
