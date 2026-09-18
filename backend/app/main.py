@@ -15,7 +15,7 @@ GET /api/overview           Lahore-wide summary
 GET /api/ranking            (Day 2) Prioritised town action list for authorities
 
 Run locally:
-    uvicorn backend.app.main:app --reload --port 8000
+    uvicorn app.main:app --reload --port 8000
 
 Then open http://localhost:8000/docs for interactive API docs.
 
@@ -33,18 +33,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database import get_connection
-from backend.app.services.risk_engine import calculate_heat_risk, explain
-from backend.app.services.heat_intelligence import (
+from app.services.risk_engine import calculate_heat_risk, explain
+from app.services.heat_intelligence import (
     historical_comparison,
     rank_towns,
 )
-from backend.app.services.forecast import (
+from app.services.forecast import (
     forecast_risk_series,
     forecast_daily_peaks,
     predictive_alerts,
 )
-from backend.app.services.situation_report import build_situation_report
-from backend.app.scheduler import (
+from app.services.situation_report import build_situation_report
+from app.scheduler import (
     start_scheduler,
     stop_scheduler,
     refresh_status,
@@ -478,5 +478,5 @@ def _recommended_action(level: str, town_name: str) -> str:
 
 
 def _band_for_score(score: float) -> dict:
-    from backend.app.services.risk_engine import risk_band
+    from app.services.risk_engine import risk_band
     return risk_band(score)

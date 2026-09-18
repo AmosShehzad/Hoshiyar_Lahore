@@ -20,7 +20,7 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import dataclass
 
-from backend.app.services.risk_engine import calculate_heat_risk
+from app.services.risk_engine import calculate_heat_risk
 
 
 # ---------------------------------------------------------------------------
@@ -186,3 +186,4 @@ def rank_towns(conn) -> list[RankedTown]:
             estimated_exposed_population=exposed,
         ))
     return ranked
+

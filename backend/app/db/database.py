@@ -117,3 +117,4 @@ def load_towns_from_metadata(db_path: str = DEFAULT_DB_PATH) -> int:
 if __name__ == "__main__":
     init_db()
     load_towns_from_metadata()
+

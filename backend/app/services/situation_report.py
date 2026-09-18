@@ -22,9 +22,9 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import dataclass
 
-from backend.app.services.forecast import forecast_risk_series
-from backend.app.services.heat_intelligence import historical_comparison
-from backend.app.services.risk_engine import calculate_heat_risk
+from app.services.forecast import forecast_risk_series
+from app.services.heat_intelligence import historical_comparison
+from app.services.risk_engine import calculate_heat_risk
 
 
 @dataclass
@@ -183,3 +183,4 @@ def build_situation_report(conn, town_id: str) -> SituationReport | None:
         body=body,
         sms_short=sms_short,
     )
+

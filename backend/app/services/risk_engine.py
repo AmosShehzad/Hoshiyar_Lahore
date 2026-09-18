@@ -32,7 +32,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from backend.app.services.heat_index import heat_index_celsius
+from app.services.heat_index import heat_index_celsius
 
 # ---------------------------------------------------------------------------
 # Weights (must sum to 1.0)

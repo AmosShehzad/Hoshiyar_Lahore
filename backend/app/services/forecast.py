@@ -31,7 +31,7 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import dataclass
 
-from backend.app.services.risk_engine import calculate_heat_risk
+from app.services.risk_engine import calculate_heat_risk
 
 
 # ---------------------------------------------------------------------------
@@ -228,3 +228,4 @@ def _predictive_action(name, level, hours) -> str:
         return (f"Plan resource allocation for {name}; brief local health "
                 f"facilities on the incoming heat.")
     return (f"Add {name} to the 72-hour watch list and monitor the forecast.")
+

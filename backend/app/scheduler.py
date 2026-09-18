@@ -121,7 +121,7 @@ _weather_cooldown_until: dt.datetime | None = None
 def _weather_age_minutes() -> float | None:
     """Age of the current weather data in minutes, or None if there's none yet."""
     try:
-        from backend.app.db.database import get_connection
+        from app.db.database import get_connection
         conn = get_connection()
         try:
             row = conn.execute(
@@ -283,7 +283,7 @@ def _historical_table_empty() -> bool:
     we attempt to build it rather than silently waiting.
     """
     try:
-        from backend.app.db.database import get_connection
+        from app.db.database import get_connection
         conn = get_connection()
         try:
             row = conn.execute(

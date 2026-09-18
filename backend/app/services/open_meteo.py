@@ -20,7 +20,7 @@ This module talks to the live Open-Meteo API. If you are running in a sandboxed
 environment without outbound internet, these calls will fail. On a normal machine
 with internet access they work without any key. Run:
 
-    python -m backend.app.services.open_meteo
+    python -m app.services.open_meteo
 
 to do a quick smoke test against Lahore's centroid.
 """
