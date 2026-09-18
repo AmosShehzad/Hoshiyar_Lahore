@@ -1,0 +1,225 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "lahore_city",
+        "name": "Lahore City Tehsil",
+        "name_ur": "تحصیل لاہور شہر",
+        "source": "approximate_fallback"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.38418,
+              31.575
+            ],
+            [
+              74.35194,
+              31.63688
+            ],
+            [
+              74.26322,
+              31.64403
+            ],
+            [
+              74.23294,
+              31.575
+            ],
+            [
+              74.26662,
+              31.51099
+            ],
+            [
+              74.35822,
+              31.50385
+            ],
+            [
+              74.38418,
+              31.575
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "shalimar",
+        "name": "Shalimar Tehsil",
+        "name_ur": "تحصیل شالیمار",
+        "source": "approximate_fallback"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.46683,
+              31.59908
+            ],
+            [
+              74.41845,
+              31.66716
+            ],
+            [
+              74.3142,
+              31.66438
+            ],
+            [
+              74.28994,
+              31.58058
+            ],
+            [
+              74.34028,
+              31.51029
+            ],
+            [
+              74.44775,
+              31.51341
+            ],
+            [
+              74.46683,
+              31.59908
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "model_town",
+        "name": "Model Town Tehsil",
+        "name_ur": "تحصیل ماڈل ٹاؤن",
+        "source": "approximate_fallback"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.40582,
+              31.49144
+            ],
+            [
+              74.33707,
+              31.56538
+            ],
+            [
+              74.23889,
+              31.52839
+            ],
+            [
+              74.2006,
+              31.4478
+            ],
+            [
+              74.27192,
+              31.37159
+            ],
+            [
+              74.37368,
+              31.40934
+            ],
+            [
+              74.40582,
+              31.49144
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "lahore_cantonment",
+        "name": "Lahore Cantonment Tehsil",
+        "name_ur": "تحصیل لاہور چھاؤنی",
+        "source": "approximate_fallback"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.53617,
+              31.53802
+            ],
+            [
+              74.4417,
+              31.61682
+            ],
+            [
+              74.33109,
+              31.56139
+            ],
+            [
+              74.29986,
+              31.46068
+            ],
+            [
+              74.39763,
+              31.3796
+            ],
+            [
+              74.51221,
+              31.43634
+            ],
+            [
+              74.53617,
+              31.53802
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "raiwind",
+        "name": "Raiwind Tehsil",
+        "name_ur": "تحصیل رائونڈ",
+        "source": "approximate_fallback"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.32412,
+              31.30188
+            ],
+            [
+              74.21501,
+              31.37262
+            ],
+            [
+              74.10889,
+              31.30402
+            ],
+            [
+              74.09213,
+              31.19642
+            ],
+            [
+              74.20619,
+              31.15669
+            ],
+            [
+              74.31471,
+              31.19406
+            ],
+            [
+              74.32412,
+              31.30188
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

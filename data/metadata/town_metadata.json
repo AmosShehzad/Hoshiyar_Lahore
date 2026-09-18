@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "description": "Baseline metadata for Lahore's 5 official administrative tehsils (2023 census), used by HoshiyarLahore.",
+    "spatial_unit": "Lahore administrative tehsils (2023 Census of Pakistan, pre-2024 five-tehsil structure)",
+    "town_count": 5,
+    "data_provenance": {
+      "population": "2023 Census of Pakistan, PBS Table 1 (Punjab), Lahore District. Official figures. Source: https://www.pbs.gov.pk/wp-content/uploads/census_tables/tables/table_1_punjab_districts.pdf . The five tehsils sum to 13,004,135 (district total in the same table is 13,004,135; the ~1.99M difference is the 'restricted/uncounted' district-level residual PBS lists separately).",
+      "area_km2": "2023 Census / PBS Table 1, column 'AREA SQ.K.M'. Official tehsil areas.",
+      "population_density": "2023 Census / PBS Table 1, 'POPULATION DENSITY PER SQ.K.M'. Matches population/area.",
+      "centroid": "Approximate tehsil centroid (WGS84), used to query weather. Refine from OSM boundaries when available.",
+      "vegetation_deficit": "Proxy 0.0-1.0 estimating built-up / vegetation-poor character (1.0 = fully built-up). ESTIMATE, not a census figure - see docs/DATA_SOURCES.md.",
+      "elevation_band": "Rough elevation category. Lahore is generally flat (~210-220m)."
+    },
+    "verification_status": "Population, area, and density for all 5 tehsils are OFFICIAL 2023 census figures from PBS Table 1 (verified=true). Only vegetation_deficit and centroid are estimates. Sum of 5 tehsils = 13,004,135.",
+    "IMPORTANT": "vegetation_deficit is a land-cover proxy, not a census statistic. In 2024 Punjab split Lahore into 10 tehsils; this build intentionally uses the original 5-tehsil structure that matches the 2023 census cleanly."
+  },
+  "towns": [
+    {
+      "id": "lahore_city",
+      "name": "Lahore City Tehsil",
+      "name_ur": "تحصیل لاہور شہر",
+      "centroid": {
+        "lat": 31.575,
+        "lon": 74.31
+      },
+      "population": 4123354,
+      "area_km2": 214.0,
+      "vegetation_deficit": 0.88,
+      "elevation_band": "flat",
+      "notes": "Central urban core including the historic Walled City. Extremely dense, low vegetation, strongest urban heat-island effect. 2023 census.",
+      "verified": true,
+      "population_density": 19268
+    },
+    {
+      "id": "shalimar",
+      "name": "Shalimar Tehsil",
+      "name_ur": "تحصیل شالیمار",
+      "centroid": {
+        "lat": 31.59,
+        "lon": 74.38
+      },
+      "population": 2670140,
+      "area_km2": 272.0,
+      "vegetation_deficit": 0.8,
+      "elevation_band": "flat",
+      "notes": "Dense neighbourhoods along the Grand Trunk Road (Harbanspura, Mughalpura). 2023 census.",
+      "verified": true,
+      "population_density": 9817
+    },
+    {
+      "id": "model_town",
+      "name": "Model Town Tehsil",
+      "name_ur": "تحصیل ماڈل ٹاؤن",
+      "centroid": {
+        "lat": 31.47,
+        "lon": 74.305
+      },
+      "population": 3244906,
+      "area_km2": 353.0,
+      "vegetation_deficit": 0.6,
+      "elevation_band": "flat",
+      "notes": "Large planned southern tehsil (Model Town, Johar Town, Garden Town); more tree cover than the old city. 2023 census.",
+      "verified": true,
+      "population_density": 9192
+    },
+    {
+      "id": "lahore_cantonment",
+      "name": "Lahore Cantonment Tehsil",
+      "name_ur": "تحصیل لاہور چھاؤنی",
+      "centroid": {
+        "lat": 31.5,
+        "lon": 74.42
+      },
+      "population": 1885098,
+      "area_km2": 466.0,
+      "vegetation_deficit": 0.45,
+      "elevation_band": "flat",
+      "notes": "Includes DHA, Cantt, Walton, Bedian, Burki; greener and lower density. 2023 census.",
+      "verified": true,
+      "population_density": 4045
+    },
+    {
+      "id": "raiwind",
+      "name": "Raiwind Tehsil",
+      "name_ur": "تحصیل رائونڈ",
+      "centroid": {
+        "lat": 31.25,
+        "lon": 74.21
+      },
+      "population": 1080637,
+      "area_km2": 467.0,
+      "vegetation_deficit": 0.35,
+      "elevation_band": "flat",
+      "notes": "Large peri-urban / agricultural tehsil on the southern edge; lowest density, most vegetation. 2023 census.",
+      "verified": true,
+      "population_density": 2314
+    }
+  ]
+}

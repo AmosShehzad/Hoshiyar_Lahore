@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "leaflet/dist/leaflet.css";
+
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+body {
+  background: #15100C;
+  color: #F3E9DC;
+  margin: 0;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Selection color matches the brand chrome, not the browser default blue */
+::selection {
+  background: rgba(198, 138, 61, 0.35);
+  color: #F3E9DC;
+}
+
+/* Slim, warm-toned scrollbars so they don't clash with the dark instrument look */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #15100C;
+}
+::-webkit-scrollbar-thumb {
+  background: #3D2E24;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4A382C;
+}
+
+/* Visible keyboard focus - never suppressed, just restyled to match the palette */
+:focus-visible {
+  outline: 2px solid #C68A3D;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Leaflet - real OpenStreetMap tiles, with a CSS filter that recolors the
+   tiles to match the warm dark theme, without changing the underlying map
+   data - it's still a real map, just restyled the same way the rest of the
+   UI is dark-themed. Scoped to .leaflet-tile-pane only, so it affects just
+   the raw map imagery - NOT the GeoJSON risk polygons or cooling-centre
+   markers drawn in the overlay pane above it, which keep their real
+   risk-band colors. */
+.leaflet-container {
+  background: #0d0a08;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui;
+}
+.hoshiyar-map-dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+.town-tooltip {
+  background: #1F1712;
+  border: 1px solid #3D2E24;
+  color: #F3E9DC;
+  font-size: 12px;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+/* Custom range slider (what-if simulator) - styled to look like an instrument
+   control, not a default browser slider. */
+input[type="range"].hoshiyar-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #3D2E24, #3D2E24);
+  outline: none;
+}
+input[type="range"].hoshiyar-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #C68A3D;
+  border: 3px solid #15100C;
+  box-shadow: 0 0 0 1px #C68A3D, 0 2px 6px rgba(0,0,0,0.5);
+  cursor: pointer;
+  margin-top: -6px;
+}
+input[type="range"].hoshiyar-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #C68A3D;
+  border: 3px solid #15100C;
+  box-shadow: 0 0 0 1px #C68A3D, 0 2px 6px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+input[type="range"].hoshiyar-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+}

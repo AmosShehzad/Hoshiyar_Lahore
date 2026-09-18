@@ -1,0 +1,59 @@
+name: Keep Render backend awake
+
+# Pings the deployed backend every 10 minutes so Render's free-tier web
+# service (which sleeps after 15 minutes of no traffic) never gets the chance
+# to go to sleep. This keeps the in-process auto-refresh scheduler
+# (backend/app/scheduler.py) running continuously instead of only refreshing
+# on cold starts.
+#
+# WHY 10 MINUTES, NOT 14
+# -----------------------
+# Render's free tier sleeps after 15 minutes of inactivity. GitHub Actions
+# scheduled ("cron") runs are not perfectly on time - GitHub's own docs note
+# scheduled workflows can be delayed by a few minutes during busy periods.
+# A 14-minute schedule leaves almost no safety margin and could occasionally
+# let the service fall asleep anyway. 10 minutes leaves a comfortable buffer.
+#
+# SETUP (one-time)
+# -----------------
+# 1. Deploy the backend to Render first and copy its live URL
+#    (looks like https://hoshiyar-lahore-api.onrender.com).
+# 2. In your GitHub repo: Settings -> Secrets and variables -> Actions
+#    -> Variables tab -> "New repository variable".
+#    Name:  BACKEND_URL
+#    Value: https://your-actual-render-url.onrender.com   (no trailing slash)
+# 3. Commit this file (already done if you're reading it from the repo).
+#    That's it - GitHub runs this automatically every 10 minutes from then on.
+#
+# COST
+# ----
+# GitHub Actions: this job runs for a few seconds every 10 minutes -
+# negligible against GitHub's free minutes allowance.
+# Render: keeping one free web service awake 24/7 uses close to (but under)
+# Render's 750 free instance-hours/month cap for a single service. For a
+# hackathon week this is a non-issue; if you plan to keep it running
+# long-term afterwards, keep an eye on your Render usage dashboard.
+#
+# You can pause this anytime: Actions tab -> this workflow -> "..." -> Disable.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}  # lets you trigger it manually from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend to keep it awake
+        run: |
+          if [ -z "${{ vars.BACKEND_URL }}" ]; then
+            echo "BACKEND_URL repository variable is not set yet."
+            echo "Set it under Settings -> Secrets and variables -> Actions -> Variables."
+            echo "Skipping ping for now (this is not an error, just not configured)."
+            exit 0
+          fi
+          echo "Pinging ${{ vars.BACKEND_URL }} ..."
+          curl -sS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" \
+            --max-time 30 "${{ vars.BACKEND_URL }}/" || \
+            echo "Ping failed (backend may be cold-starting or temporarily down) - not treated as a workflow failure."
